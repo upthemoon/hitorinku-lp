@@ -41,10 +41,18 @@ f_meta = find_font(26)
 
 # 左側エリア（テキスト）
 LEFT_X = 60
-# ロゴマーク（オレンジH）
-draw.rectangle([(LEFT_X, 70), (LEFT_X + 56, 126)], fill=NAVY_DARK, outline=ORANGE, width=3)
-draw.text((LEFT_X + 14, 70), "H", fill=ORANGE, font=f_brand)
-draw.text((LEFT_X + 80, 80), "Hitorinku", fill=WHITE, font=f_brand)
+# 実アプリアイコンを左上に配置
+try:
+    icon = Image.open("/Users/sherlockholmes/hitorinku-lp/icon-256.png").convert("RGBA")
+    icon = icon.resize((90, 90), Image.LANCZOS)
+    # 角丸マスク
+    mask = Image.new("L", (90, 90), 0)
+    mask_draw = ImageDraw.Draw(mask)
+    mask_draw.rounded_rectangle([(0, 0), (90, 90)], radius=20, fill=255)
+    img.paste(icon, (LEFT_X, 65), mask)
+except Exception as e:
+    print("icon paste failed:", e)
+draw.text((LEFT_X + 110, 80), "Hitorinku", fill=WHITE, font=f_brand)
 
 # タイトル
 draw.text((LEFT_X, 200), "現場の数字、", fill=WHITE, font=f_title)
@@ -59,7 +67,7 @@ draw.text((LEFT_X, 540), "App Storeで入手  •  iPhone・iPad対応", fill=SU
 
 # 右側にスクショ重ね
 try:
-    shot = Image.open("/Users/sherlockholmes/hitorinku-lp/screenshots/hitorinku_01_matrix.png")
+    shot = Image.open("/Users/sherlockholmes/hitorinku-lp/screenshots/hitorinku_01_matrix.jpg")
     # 縦長なのでHに合わせてリサイズ
     target_h = 540
     aspect = shot.width / shot.height
