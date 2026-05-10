@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://roygraphy-web.github.io/hitorinku-lp/sitemap.xml
