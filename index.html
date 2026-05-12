@@ -8,13 +8,17 @@
 <meta property="og:title" content="Hitorinku — 工務店の出勤管理アプリ">
 <meta property="og:description" content="現場の数字、見える化。月¥1,500で出勤・人工・有給・PDFまで。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://hitorinku.app/">
+<meta property="og:url" content="https://hitorinku.upthemoon.co.jp/">
 <meta property="og:image" content="https://hitorinku.upthemoon.co.jp/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="icon-64.png">
 <link rel="apple-touch-icon" href="icon-256.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;500;600;700;900&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5WYBNSQJCK"></script>
@@ -27,452 +31,1155 @@
 
 <style>
   :root {
-    --navy: #1E3A5F;
-    --navy-dark: #142943;
-    --orange: #F5A623;
-    --bg: #FAFBFC;
-    --text: #1A1F2C;
-    --text-sub: #5C6678;
-    --border: #E5E8EE;
-    --white: #FFFFFF;
+    /* 棟梁の現場手帳パレット */
+    --indigo-deep: #1A2B4A;        /* 深紺墨 — 見出し */
+    --indigo: #2B3F66;             /* 紺青 — 強調 */
+    --slate: #4B5C7A;              /* 鋼鉄 — サブ */
+    --alizarin: #B23F38;           /* 朱印 — アクセント・落款 */
+    --alizarin-dark: #8A2E29;
+    --cream: #F4EDDC;              /* 古紙 — 背景 */
+    --cream-warm: #E8DEC4;         /* 麻紙 — セクション分け */
+    --cream-deep: #DCC9A0;         /* 茶系古紙 */
+    --ink: #1A1A1A;                /* 墨 — 本文 */
+    --ink-sub: #5C5C5C;            /* 薄墨 — サブテキスト */
+    --border: #C9BF9F;             /* 罫線 */
+    --blueprint-blue: #1E5C8C;     /* 青写真 */
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Helvetica Neue", sans-serif;
-    color: var(--text);
-    background: var(--bg);
-    line-height: 1.7;
+    font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    font-weight: 400;
+    color: var(--ink);
+    background-color: var(--cream);
+    line-height: 1.85;
     -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse at 18% 8%, rgba(255, 248, 224, 0.6) 0%, transparent 55%),
+      radial-gradient(ellipse at 82% 92%, rgba(178, 63, 56, 0.05) 0%, transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
   }
-  a { color: var(--navy); text-decoration: none; }
+
+  /* 古紙テクスチャ */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    filter: url(#paperNoise);
+    background: rgba(0,0,0,0);
+    opacity: 0.06;
+    mix-blend-mode: multiply;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.08;
+    mix-blend-mode: multiply;
+    background-image:
+      radial-gradient(ellipse 320px 200px at 10% 20%, rgba(120, 85, 50, 0.45) 0%, transparent 70%),
+      radial-gradient(ellipse 420px 240px at 78% 30%, rgba(100, 70, 40, 0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 320px 220px at 28% 78%, rgba(140, 95, 55, 0.40) 0%, transparent 68%),
+      radial-gradient(ellipse 380px 200px at 88% 86%, rgba(110, 80, 45, 0.40) 0%, transparent 70%);
+  }
+
+  a { color: var(--indigo); text-decoration: none; transition: opacity 0.2s; }
+  a:hover { opacity: 0.75; }
   img { max-width: 100%; display: block; }
 
-  /* Header */
+  /* ヘッダ */
   header {
-    background: var(--white);
+    background: rgba(244, 237, 220, 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
-    padding: 14px 24px;
+    padding: 14px 28px;
     position: sticky;
     top: 0;
     z-index: 100;
   }
   .nav {
-    max-width: 1100px;
+    max-width: 1120px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-  .logo {
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--navy);
-    letter-spacing: 0.5px;
+  .brand {
+    font-family: "Shippori Mincho", "Noto Serif JP", serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--indigo-deep);
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
   }
-  .logo-mark {
-    display: inline-block;
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    margin-right: 10px;
-    vertical-align: middle;
-  }
-  .logo { display: inline-flex; align-items: center; }
+  .brand img { width: 32px; height: 32px; border-radius: 6px; }
   .cta-mini {
-    background: var(--orange);
-    color: var(--white) !important;
-    padding: 8px 16px;
-    border-radius: 8px;
+    background: var(--alizarin);
+    color: var(--cream) !important;
+    padding: 9px 18px;
+    border-radius: 4px;
     font-weight: 700;
     font-size: 13px;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(178, 63, 56, 0.25);
   }
+  .cta-mini:hover { opacity: 1; background: var(--alizarin-dark); }
 
-  /* Hero */
+  /* HERO */
   .hero {
-    padding: 72px 24px 56px;
-    text-align: center;
-    background: linear-gradient(180deg, #FFFFFF 0%, #F4F7FB 100%);
+    position: relative;
+    padding: 96px 24px 88px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at top right, rgba(43, 63, 102, 0.07) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom left, rgba(178, 63, 56, 0.06) 0%, transparent 50%),
+      var(--cream);
   }
-  .hero-inner { max-width: 880px; margin: 0 auto; }
+  .hero-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 56px;
+    align-items: center;
+  }
   .hero-tag {
-    display: inline-block;
-    background: rgba(245, 166, 35, 0.12);
-    color: #B27212;
-    padding: 6px 14px;
-    border-radius: 100px;
-    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--alizarin);
+    padding: 6px 0;
+    font-family: "Shippori Mincho", "Noto Serif JP", serif;
+    font-size: 13px;
     font-weight: 700;
-    margin-bottom: 20px;
+    letter-spacing: 0.25em;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .hero-tag::before, .hero-tag::after {
+    content: "";
+    width: 32px; height: 1px;
+    background: var(--alizarin);
+    opacity: 0.5;
   }
   .hero h1 {
-    font-size: clamp(28px, 5vw, 46px);
-    font-weight: 900;
-    color: var(--navy);
-    line-height: 1.3;
-    margin-bottom: 20px;
-    letter-spacing: -0.5px;
+    font-family: "Shippori Mincho", "Noto Serif JP", serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5.5vw, 58px);
+    color: var(--indigo-deep);
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+    margin-bottom: 28px;
   }
-  .hero h1 .accent { color: var(--orange); }
+  .hero h1 .accent {
+    color: var(--alizarin);
+    position: relative;
+    display: inline-block;
+  }
+  .hero h1 .accent::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -6px;
+    height: 3px;
+    background: var(--alizarin);
+    opacity: 0.35;
+  }
   .hero p.lead {
-    font-size: clamp(15px, 2vw, 18px);
-    color: var(--text-sub);
-    margin-bottom: 32px;
-    max-width: 680px;
-    margin-left: auto;
-    margin-right: auto;
+    font-family: "Klee One", "Noto Sans JP", sans-serif;
+    font-size: clamp(15px, 1.6vw, 17px);
+    color: var(--ink-sub);
+    margin-bottom: 36px;
+    max-width: 560px;
+    line-height: 2.1;
   }
   .cta-row {
     display: flex;
-    gap: 12px;
-    justify-content: center;
+    gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
   .btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 14px 28px;
-    border-radius: 12px;
+    gap: 10px;
+    padding: 16px 32px;
+    border-radius: 4px;
     font-size: 15px;
     font-weight: 700;
-    transition: all 0.15s;
+    transition: all 0.2s;
     border: none;
     cursor: pointer;
+    letter-spacing: 0.05em;
+    font-family: "Noto Sans JP", sans-serif;
   }
   .btn-primary {
-    background: var(--navy);
-    color: var(--white);
+    background: var(--indigo-deep);
+    color: var(--cream);
+    box-shadow: 0 6px 18px rgba(26, 43, 74, 0.3);
   }
-  .btn-primary:hover { background: var(--navy-dark); transform: translateY(-1px); }
+  .btn-primary:hover {
+    background: var(--indigo);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(26, 43, 74, 0.35);
+    opacity: 1;
+  }
   .btn-secondary {
-    background: var(--white);
-    color: var(--navy);
-    border: 2px solid var(--navy);
+    background: transparent;
+    color: var(--indigo-deep);
+    border: 1.5px solid var(--indigo-deep);
   }
-  .btn-secondary:hover { background: var(--navy); color: var(--white); }
-  .hero-meta { font-size: 13px; color: var(--text-sub); }
-  .hero-meta strong { color: var(--navy); }
+  .btn-secondary:hover { background: var(--indigo-deep); color: var(--cream); opacity: 1; }
+  .hero-meta {
+    font-family: "Klee One", "Noto Sans JP", sans-serif;
+    font-size: 13px;
+    color: var(--ink-sub);
+    letter-spacing: 0.04em;
+  }
+  .hero-meta strong { color: var(--indigo-deep); font-weight: 700; }
 
-  /* Sections */
-  section { padding: 72px 24px; }
-  .container { max-width: 1100px; margin: 0 auto; }
-  h2 {
-    font-size: clamp(24px, 4vw, 34px);
-    font-weight: 900;
-    color: var(--navy);
+  /* HERO 右側: 工務帳プレート */
+  .hero-art {
+    position: relative;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .blueprint-plate {
+    --bp-cream: #F4EDDC;
+    --bp-cream-warm: #E8DEC4;
+    --bp-border: #C9BF9F;
+    --bp-ink-sub: #5C5C5C;
+    --bp-indigo-deep: #1A2B4A;
+    --bp-alizarin: #B23F38;
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 4 / 5.2;
+    background-color: var(--bp-cream);
+    border: 1px solid var(--bp-border);
+    border-radius: 2px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 16px 40px -18px rgba(26, 43, 74, 0.32),
+      0 4px 10px -6px rgba(26, 43, 74, 0.18);
+    overflow: hidden;
+    font-family: "Shippori Mincho", "Noto Serif JP", serif;
+    color: var(--bp-indigo-deep);
+    isolation: isolate;
+  }
+  .blueprint-plate::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 25% 15%, rgba(255, 250, 230, 0.5) 0%, transparent 55%),
+      radial-gradient(ellipse at center, transparent 60%, rgba(100, 70, 40, 0.10) 100%);
+  }
+  /* 図面の方眼線 */
+  .blueprint-plate::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(43, 63, 102, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(43, 63, 102, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.5;
+  }
+  .bp-body {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 70px 1fr auto;
+  }
+  .bp-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 24px 0;
+    border-bottom: 1px solid rgba(26, 43, 74, 0.15);
+  }
+  .bp-plate-no {
+    font-family: "Shippori Mincho", serif;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--bp-ink-sub);
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .bp-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .bp-title-row .vol {
+    font-family: "Shippori Mincho", serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bp-indigo-deep);
+    letter-spacing: 0.1em;
+  }
+  .bp-title-row .stamp {
+    width: 28px; height: 28px;
+    border: 1.5px solid var(--bp-alizarin);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bp-alizarin);
+    font-family: "Shippori Mincho", serif;
+    font-size: 13px;
+    font-weight: 700;
+    transform: rotate(-6deg);
+    opacity: 0.85;
+  }
+  .bp-slot {
+    position: relative;
+    margin: 14px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+  .bp-img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+    padding: 18px;
+    box-sizing: border-box;
+    border-radius: 18px;
+    background: var(--bp-indigo-deep);
+    box-shadow: 0 8px 24px rgba(26, 43, 74, 0.25);
+  }
+  .bp-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px 22px;
+    border-top: 1px solid rgba(26, 43, 74, 0.15);
+    background: transparent;
+    color: var(--bp-indigo-deep);
     text-align: center;
+  }
+  .bp-names .bp-sci {
+    font-family: "Shippori Mincho", serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--bp-indigo-deep);
+    letter-spacing: 0.06em;
+    margin: 0;
+  }
+  .bp-names .bp-jp {
+    font-family: "Klee One", sans-serif;
+    font-size: 11px;
+    color: var(--bp-ink-sub);
+    letter-spacing: 0.12em;
+    margin: 4px 0 0;
+  }
+  .bp-foot {
+    font-family: "Shippori Mincho", serif;
+    font-style: italic;
+    font-size: 10px;
+    color: var(--bp-ink-sub);
+    letter-spacing: 0.15em;
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  /* 装飾デコ - 釘・ねじ */
+  .nail-deco {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    color: var(--alizarin);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .nail-deco.n1 { top: 8%; left: 4%; transform: rotate(-12deg); }
+  .nail-deco.n2 { bottom: 14%; right: 6%; transform: rotate(30deg); color: var(--slate); }
+  .nail-deco.n3 { top: 60%; left: 47%; width: 18px; opacity: 0.22; }
+
+  @media (max-width: 880px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 36px; text-align: center; }
+    .hero p.lead { margin-left: auto; margin-right: auto; }
+    .cta-row { justify-content: center; }
+    .hero-tag { margin-left: auto; margin-right: auto; }
+  }
+
+  /* セクション共通 */
+  section { padding: 96px 24px; position: relative; }
+  .container { max-width: 1120px; margin: 0 auto; }
+  .section-eyebrow {
+    font-family: "Shippori Mincho", serif;
+    font-weight: 600;
+    color: var(--alizarin);
+    text-align: center;
+    letter-spacing: 0.5em;
+    font-size: 13px;
     margin-bottom: 12px;
-    letter-spacing: -0.3px;
+  }
+  .section-vol {
+    text-align: center;
+    color: var(--ink-sub);
+    font-family: "Shippori Mincho", serif;
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    margin-bottom: 18px;
+  }
+  h2 {
+    font-family: "Shippori Mincho", "Noto Serif JP", serif;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 40px);
+    color: var(--indigo-deep);
+    text-align: center;
+    margin-bottom: 16px;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
   }
   .section-sub {
+    font-family: "Klee One", "Noto Sans JP", sans-serif;
     text-align: center;
-    color: var(--text-sub);
-    margin-bottom: 48px;
+    color: var(--ink-sub);
+    margin-bottom: 56px;
     font-size: 15px;
+    line-height: 1.95;
   }
 
-  /* Pain points */
+  /* セクション間の区切り */
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 32px 0;
+    gap: 18px;
+    max-width: 280px;
+    color: var(--slate);
+  }
+  .divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* Pain points: 現場の野帳メモ */
+  .pain { background: var(--cream-warm); }
   .pain-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
     margin-top: 40px;
   }
   .pain-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
+    background: var(--cream);
+    border-radius: 2px;
+    padding: 32px 28px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset,
+      0 10px 30px -10px rgba(26, 43, 74, 0.12);
+    position: relative;
+    transition: transform 0.25s;
+    border-left: 3px solid var(--alizarin);
   }
-  .pain-card .pain-emoji { font-size: 32px; margin-bottom: 12px; }
-  .pain-card h3 { color: var(--navy); margin-bottom: 8px; font-size: 16px; }
-  .pain-card p { color: var(--text-sub); font-size: 14px; }
+  .pain-card:hover { transform: translateY(-4px) rotate(-0.4deg); }
+  .pain-card:nth-child(2) { transform: rotate(0.4deg); border-left-color: var(--indigo); }
+  .pain-card:nth-child(2):hover { transform: translateY(-4px) rotate(0.8deg); }
+  .pain-card:nth-child(3) { border-left-color: var(--slate); }
+  .pain-card:nth-child(4) { transform: rotate(-0.3deg); border-left-color: var(--alizarin-dark); }
+  .pain-card:nth-child(4):hover { transform: translateY(-4px) rotate(-0.7deg); }
+  .pain-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(178, 63, 56, 0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--alizarin);
+    margin-bottom: 18px;
+  }
+  .pain-card:nth-child(2) .pain-icon { background: rgba(43, 63, 102, 0.10); color: var(--indigo); }
+  .pain-card:nth-child(3) .pain-icon { background: rgba(75, 92, 122, 0.10); color: var(--slate); }
+  .pain-card:nth-child(4) .pain-icon { background: rgba(138, 46, 41, 0.10); color: var(--alizarin-dark); }
+  .pain-card h3 {
+    font-family: "Shippori Mincho", serif;
+    color: var(--indigo-deep);
+    margin-bottom: 10px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .pain-card p {
+    font-family: "Klee One", sans-serif;
+    color: var(--ink-sub);
+    font-size: 14px;
+    line-height: 1.85;
+  }
 
-  /* Features */
-  .features {
-    background: var(--white);
-    padding-top: 80px;
-    padding-bottom: 80px;
-  }
+  /* Features: 図面風レイアウト */
+  .features { background: var(--cream); }
   .feature-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
+    gap: 80px;
     align-items: center;
-    margin-bottom: 80px;
+    margin-bottom: 100px;
   }
   .feature-row:last-child { margin-bottom: 0; }
   .feature-row.reverse { direction: rtl; }
   .feature-row.reverse > * { direction: ltr; }
   .feature-num {
-    display: inline-block;
-    background: var(--orange);
-    color: var(--white);
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    text-align: center;
-    line-height: 36px;
-    font-weight: 900;
-    margin-bottom: 14px;
+    font-family: "Shippori Mincho", serif;
+    font-size: 14px;
+    color: var(--alizarin);
+    letter-spacing: 0.35em;
+    margin-bottom: 8px;
+    font-weight: 600;
   }
   .feature-text h3 {
-    font-size: 24px;
-    color: var(--navy);
-    margin-bottom: 12px;
-    font-weight: 900;
+    font-family: "Shippori Mincho", "Noto Serif JP", serif;
+    font-size: clamp(22px, 3vw, 28px);
+    color: var(--indigo-deep);
+    margin-bottom: 18px;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
   }
   .feature-text p {
-    color: var(--text-sub);
-    margin-bottom: 14px;
+    font-family: "Klee One", sans-serif;
+    color: var(--ink-sub);
+    margin-bottom: 22px;
+    line-height: 2.05;
   }
-  .feature-text ul {
-    list-style: none;
-    padding: 0;
-  }
+  .feature-text ul { list-style: none; padding: 0; }
   .feature-text li {
-    padding: 6px 0 6px 28px;
+    padding: 8px 0 8px 32px;
     position: relative;
-    color: var(--text);
-    font-size: 14px;
+    color: var(--ink);
+    font-size: 14.5px;
+    line-height: 1.85;
   }
   .feature-text li::before {
-    content: "✓";
+    content: "";
     position: absolute;
     left: 0;
-    color: var(--orange);
-    font-weight: 900;
+    top: 16px;
+    width: 18px;
+    height: 1px;
+    background: var(--alizarin);
   }
-  .feature-img {
-    border-radius: 28px;
+  .feature-text li::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    width: 8px;
+    height: 8px;
+    background: var(--alizarin);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--cream);
+  }
+
+  .feature-img-wrap {
+    position: relative;
     max-width: 280px;
     margin: 0 auto;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(30, 58, 95, 0.25);
-    background: var(--navy);
+    padding: 18px;
+    background: var(--cream-warm);
+    border-radius: 2px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.6) inset,
+      0 28px 56px -20px rgba(26, 43, 74, 0.25);
   }
-  .feature-img img { width: 100%; display: block; }
-  @media (max-width: 768px) {
-    .feature-row { grid-template-columns: 1fr; gap: 30px; }
+  .feature-img-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    border: 1px dashed rgba(43, 63, 102, 0.3);
+    pointer-events: none;
+  }
+  .feature-img-wrap img {
+    width: 100%;
+    border-radius: 28px;
+    display: block;
+    box-shadow: 0 10px 30px rgba(26, 43, 74, 0.25);
+    background: var(--indigo-deep);
+  }
+  .feature-caption {
+    font-family: "Shippori Mincho", serif;
+    color: var(--ink-sub);
+    font-size: 11.5px;
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.2em;
+  }
+  @media (max-width: 880px) {
+    .feature-row { grid-template-columns: 1fr; gap: 40px; margin-bottom: 60px; }
     .feature-row.reverse { direction: ltr; }
   }
 
   /* Pricing */
   .pricing {
-    background: linear-gradient(180deg, #F4F7FB 0%, #FFFFFF 100%);
+    background:
+      radial-gradient(ellipse at top, rgba(43, 63, 102, 0.06) 0%, transparent 50%),
+      var(--cream-warm);
   }
   .price-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
-    max-width: 800px;
+    gap: 28px;
+    max-width: 1000px;
     margin: 0 auto;
   }
   .price-card {
-    background: var(--white);
-    border: 2px solid var(--border);
-    border-radius: 16px;
-    padding: 32px 28px;
+    background: var(--cream);
+    border-radius: 2px;
+    padding: 44px 32px;
     text-align: center;
     position: relative;
+    box-shadow: 0 18px 44px -18px rgba(26, 43, 74, 0.18);
+    border-top: 4px solid var(--slate);
   }
   .price-card.recommended {
-    border-color: var(--orange);
-    transform: scale(1.02);
-    box-shadow: 0 10px 40px rgba(245, 166, 35, 0.15);
+    border-top: 4px solid var(--alizarin);
+    transform: translateY(-12px);
+    box-shadow: 0 28px 50px -16px rgba(178, 63, 56, 0.20);
   }
   .price-badge {
     position: absolute;
-    top: -12px;
+    top: -16px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--orange);
-    color: var(--white);
-    padding: 4px 14px;
+    background: var(--alizarin);
+    color: var(--cream);
+    padding: 6px 22px;
     border-radius: 100px;
     font-size: 11px;
-    font-weight: 900;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    font-family: "Shippori Mincho", serif;
+    box-shadow: 0 6px 14px rgba(178, 63, 56, 0.3);
   }
-  .price-name { color: var(--text-sub); font-size: 14px; margin-bottom: 6px; }
+  .price-name {
+    font-family: "Shippori Mincho", serif;
+    color: var(--ink-sub);
+    font-size: 15px;
+    margin-bottom: 8px;
+    letter-spacing: 0.18em;
+  }
   .price-amount {
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--navy);
-    margin: 8px 0;
+    font-family: "Shippori Mincho", serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--indigo-deep);
+    margin: 12px 0 6px;
+    letter-spacing: 0.02em;
   }
-  .price-period { color: var(--text-sub); font-size: 13px; }
-  .price-list { list-style: none; padding: 0; margin-top: 20px; text-align: left; }
-  .price-list li { padding: 6px 0 6px 24px; position: relative; font-size: 14px; }
-  .price-list li::before { content: "✓"; color: var(--orange); position: absolute; left: 0; font-weight: 900; }
+  .price-period { color: var(--ink-sub); font-size: 13px; font-family: "Klee One", sans-serif; }
+  .price-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 28px;
+    text-align: left;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+  .price-list li {
+    padding: 7px 0 7px 26px;
+    position: relative;
+    font-size: 14px;
+    line-height: 1.7;
+    font-family: "Klee One", sans-serif;
+  }
+  .price-list li::before {
+    content: "✓";
+    color: var(--alizarin);
+    position: absolute;
+    left: 0;
+    top: 7px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .price-list li strong { color: var(--indigo-deep); font-weight: 700; }
+
+  /* BOOTH 商品案内 */
+  .booth-section {
+    background: linear-gradient(135deg, var(--cream) 0%, var(--cream-warm) 100%);
+    padding: 64px 24px;
+  }
+  .booth-card {
+    background: var(--cream);
+    border: 1.5px solid var(--alizarin);
+    border-radius: 2px;
+    padding: 36px 32px;
+    max-width: 880px;
+    margin: 0 auto;
+    box-shadow: 0 10px 40px rgba(178, 63, 56, 0.10);
+    position: relative;
+  }
+  .booth-card::before {
+    content: "限定";
+    position: absolute;
+    top: -14px;
+    right: 32px;
+    background: var(--alizarin);
+    color: var(--cream);
+    padding: 5px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    font-family: "Shippori Mincho", serif;
+    border-radius: 2px;
+  }
+  .booth-card h3 {
+    font-family: "Shippori Mincho", serif;
+    font-size: clamp(20px, 3vw, 26px);
+    color: var(--indigo-deep);
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .booth-card p {
+    font-family: "Klee One", sans-serif;
+    color: var(--ink-sub);
+    margin-bottom: 16px;
+    line-height: 1.95;
+  }
+  .booth-card strong { color: var(--indigo-deep); font-weight: 700; }
+  .booth-card .price-tag {
+    font-family: "Klee One", sans-serif;
+    font-size: 13px;
+    color: var(--ink-sub);
+    margin-left: 12px;
+  }
 
   /* FAQ */
-  .faq {
-    max-width: 760px;
-    margin: 0 auto;
-  }
+  .faq-section { background: var(--cream); }
+  .faq { max-width: 800px; margin: 0 auto; }
   details {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin-bottom: 12px;
+    background: var(--cream-warm);
+    border-radius: 2px;
+    padding: 22px 26px;
+    margin-bottom: 14px;
     cursor: pointer;
+    box-shadow: 0 4px 14px -6px rgba(26, 43, 74, 0.08);
+    transition: box-shadow 0.2s;
+    border-left: 2px solid var(--border);
+  }
+  details[open] {
+    box-shadow: 0 10px 24px -10px rgba(26, 43, 74, 0.15);
+    border-left-color: var(--alizarin);
   }
   summary {
-    font-weight: 700;
-    color: var(--navy);
+    font-family: "Shippori Mincho", serif;
+    font-weight: 600;
+    color: var(--indigo-deep);
+    font-size: 15.5px;
     list-style: none;
     position: relative;
-    padding-right: 30px;
+    padding-right: 34px;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
   }
   summary::-webkit-details-marker { display: none; }
   summary::after {
-    content: "＋";
+    content: "+";
     position: absolute;
     right: 0;
-    top: 0;
-    color: var(--orange);
-    font-weight: 900;
+    top: -2px;
+    color: var(--alizarin);
+    font-size: 24px;
+    font-weight: 300;
   }
   details[open] summary::after { content: "−"; }
   details > p {
-    margin-top: 12px;
-    color: var(--text-sub);
+    font-family: "Klee One", sans-serif;
+    margin-top: 14px;
+    color: var(--ink-sub);
     font-size: 14px;
+    line-height: 2.05;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
   }
 
-  /* CTA Final */
-  .cta-final {
-    background: var(--navy);
-    color: var(--white);
-    text-align: center;
-    padding: 80px 24px;
-  }
-  .cta-final h2 { color: var(--white); }
-  .cta-final p { color: rgba(255,255,255,0.85); margin: 16px 0 32px; }
-  .cta-final .btn-primary {
-    background: var(--orange);
-    color: var(--white);
-  }
-
-  /* Contact form */
+  /* Contact */
+  .contact-section { background: var(--cream-warm); }
   .contact {
     max-width: 560px;
     margin: 0 auto;
-    background: var(--white);
-    padding: 32px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
+    background: var(--cream);
+    padding: 44px;
+    border-radius: 2px;
+    box-shadow: 0 20px 50px -20px rgba(26, 43, 74, 0.15);
+    border-top: 4px solid var(--indigo-deep);
   }
   .contact label {
     display: block;
+    font-family: "Shippori Mincho", serif;
     font-size: 13px;
-    font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 6px;
-    margin-top: 14px;
+    font-weight: 600;
+    color: var(--indigo-deep);
+    margin-bottom: 8px;
+    margin-top: 18px;
+    letter-spacing: 0.1em;
   }
   .contact input, .contact textarea {
     width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: var(--cream-warm);
+    border-radius: 2px;
+    padding: 14px 16px;
     font-size: 14px;
-    font-family: inherit;
+    font-family: "Klee One", sans-serif;
+    color: var(--ink);
   }
   .contact input:focus, .contact textarea:focus {
-    border-color: var(--navy);
+    border-color: var(--indigo-deep);
     outline: none;
+    background: var(--cream);
   }
-  .contact textarea { min-height: 120px; resize: vertical; }
+  .contact textarea { min-height: 130px; resize: vertical; }
   .contact button {
     width: 100%;
-    margin-top: 20px;
-    background: var(--navy);
-    color: var(--white);
+    margin-top: 24px;
+    background: var(--indigo-deep);
+    color: var(--cream);
     border: none;
-    padding: 14px;
-    border-radius: 10px;
+    padding: 16px;
+    border-radius: 2px;
+    font-family: "Shippori Mincho", serif;
     font-weight: 700;
     cursor: pointer;
     font-size: 15px;
+    letter-spacing: 0.18em;
+    transition: background 0.2s;
   }
+  .contact button:hover { background: var(--indigo); }
+
+  /* Final CTA */
+  .cta-final {
+    background: var(--indigo-deep);
+    color: var(--cream);
+    text-align: center;
+    padding: 110px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-final::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at top right, rgba(178, 63, 56, 0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(220, 201, 160, 0.10) 0%, transparent 50%);
+  }
+  /* CTA 図面方眼 */
+  .cta-final::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(244, 237, 220, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244, 237, 220, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  .cta-final > * { position: relative; z-index: 1; }
+  .cta-final h2 {
+    color: var(--cream);
+    margin-bottom: 18px;
+  }
+  .cta-final p {
+    font-family: "Klee One", sans-serif;
+    color: rgba(244, 237, 220, 0.82);
+    margin: 0 auto 36px;
+    font-size: 15px;
+    line-height: 2;
+    max-width: 580px;
+  }
+  .cta-final .btn-primary {
+    background: var(--alizarin);
+    color: var(--cream);
+    box-shadow: 0 10px 30px rgba(178, 63, 56, 0.35);
+  }
+  .cta-final .btn-primary:hover { background: var(--alizarin-dark); }
 
   /* Footer */
   footer {
-    background: var(--navy-dark);
-    color: rgba(255,255,255,0.7);
+    background: var(--indigo-deep);
+    color: rgba(244, 237, 220, 0.6);
     text-align: center;
-    padding: 32px 24px;
-    font-size: 13px;
+    padding: 36px 24px;
+    font-size: 12.5px;
+    border-top: 1px solid rgba(244, 237, 220, 0.08);
   }
-  footer a { color: rgba(255,255,255,0.85); margin: 0 10px; }
+  footer a { color: rgba(244, 237, 220, 0.85); margin: 0 12px; }
+  footer .footer-mark {
+    color: var(--cream);
+    font-family: "Shippori Mincho", serif;
+    font-size: 14px;
+    letter-spacing: 0.4em;
+    margin-bottom: 14px;
+  }
 </style>
 </head>
 <body>
 
+<!-- 古紙ノイズ filter -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <filter id="paperNoise" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="11" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 0.16
+                             0 0 0 0 0.13
+                             0 0 0 0 0.09
+                             0 0 0 1 0"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- 装飾シンボル: 建築モチーフ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 釘（nail）-->
+    <symbol id="nail" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="4" r="3" fill="currentColor" stroke="none"/>
+        <line x1="12" y1="7" x2="12" y2="20"/>
+        <line x1="12" y1="20" x2="9" y2="22"/>
+        <line x1="12" y1="20" x2="15" y2="22"/>
+      </g>
+    </symbol>
+
+    <!-- 差し金（カーペンタースクエア）-->
+    <symbol id="square-tool" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 14 L 50 14 L 50 22 L 22 22 L 22 50 L 14 50 Z"/>
+        <line x1="26" y1="14" x2="26" y2="22" stroke-width="1"/>
+        <line x1="30" y1="14" x2="30" y2="22" stroke-width="1"/>
+        <line x1="34" y1="14" x2="34" y2="22" stroke-width="1"/>
+        <line x1="38" y1="14" x2="38" y2="22" stroke-width="1"/>
+        <line x1="42" y1="14" x2="42" y2="22" stroke-width="1"/>
+        <line x1="46" y1="14" x2="46" y2="22" stroke-width="1"/>
+        <line x1="14" y1="26" x2="22" y2="26" stroke-width="1"/>
+        <line x1="14" y1="30" x2="22" y2="30" stroke-width="1"/>
+        <line x1="14" y1="34" x2="22" y2="34" stroke-width="1"/>
+        <line x1="14" y1="38" x2="22" y2="38" stroke-width="1"/>
+        <line x1="14" y1="42" x2="22" y2="42" stroke-width="1"/>
+        <line x1="14" y1="46" x2="22" y2="46" stroke-width="1"/>
+      </g>
+    </symbol>
+
+    <!-- 製図コンパス -->
+    <symbol id="compass" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="32" cy="14" r="3" fill="currentColor" stroke="none"/>
+        <line x1="32" y1="14" x2="18" y2="52"/>
+        <line x1="32" y1="14" x2="46" y2="52"/>
+        <line x1="18" y1="52" x2="14" y2="56"/>
+        <line x1="46" y1="52" x2="50" y2="56"/>
+      </g>
+    </symbol>
+
+    <!-- 紙の手帳ページ -->
+    <symbol id="notebook" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="14" y="10" width="36" height="46" rx="2"/>
+        <line x1="20" y1="22" x2="44" y2="22" stroke-width="1.2"/>
+        <line x1="20" y1="30" x2="44" y2="30" stroke-width="1.2"/>
+        <line x1="20" y1="38" x2="44" y2="38" stroke-width="1.2"/>
+        <line x1="20" y1="46" x2="38" y2="46" stroke-width="1.2"/>
+        <line x1="18" y1="14" x2="18" y2="52" stroke-width="1" opacity="0.5"/>
+      </g>
+    </symbol>
+
+    <!-- カレンダー -->
+    <symbol id="calendar" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="10" y="14" width="44" height="40" rx="2"/>
+        <line x1="10" y1="24" x2="54" y2="24"/>
+        <line x1="20" y1="10" x2="20" y2="18"/>
+        <line x1="44" y1="10" x2="44" y2="18"/>
+        <circle cx="20" cy="34" r="2" fill="currentColor" stroke="none"/>
+        <circle cx="32" cy="34" r="2" fill="currentColor" stroke="none"/>
+        <circle cx="44" cy="34" r="2" fill="currentColor" stroke="none"/>
+        <circle cx="20" cy="44" r="2" fill="currentColor" stroke="none"/>
+        <circle cx="32" cy="44" r="2" fill="currentColor" stroke="none"/>
+      </g>
+    </symbol>
+
+    <!-- 書類 -->
+    <symbol id="document" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 8 L 40 8 L 50 18 L 50 56 L 16 56 Z"/>
+        <path d="M40 8 L 40 18 L 50 18"/>
+        <line x1="22" y1="28" x2="44" y2="28" stroke-width="1.5"/>
+        <line x1="22" y1="34" x2="44" y2="34" stroke-width="1.5"/>
+        <line x1="22" y1="40" x2="44" y2="40" stroke-width="1.5"/>
+        <line x1="22" y1="46" x2="36" y2="46" stroke-width="1.5"/>
+      </g>
+    </symbol>
+
+    <!-- スマホ -->
+    <symbol id="phone" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="18" y="6" width="28" height="52" rx="4"/>
+        <line x1="28" y1="11" x2="36" y2="11" stroke-width="1.5"/>
+        <circle cx="32" cy="52" r="2" fill="currentColor" stroke="none"/>
+      </g>
+    </symbol>
+
+    <!-- 区切り: リベット線 -->
+    <symbol id="divider-rivet" viewBox="0 0 120 20">
+      <g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+        <line x1="6" y1="10" x2="48" y2="10"/>
+        <line x1="72" y1="10" x2="114" y2="10"/>
+        <circle cx="60" cy="10" r="4" fill="currentColor" stroke="none"/>
+        <circle cx="60" cy="10" r="2" fill="none" stroke="rgba(244,237,220,0.5)" stroke-width="1"/>
+        <circle cx="3" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+        <circle cx="117" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
 <header>
   <div class="nav">
-    <div class="logo"><img class="logo-mark" src="icon-64.png" alt="Hitorinku">Hitorinku</div>
+    <a class="brand" href="/"><img src="icon-64.png" alt="Hitorinku">Hitorinku</a>
     <a href="#download" class="cta-mini">無料で始める</a>
   </div>
 </header>
 
+<!-- HERO -->
 <section class="hero">
+  <svg class="nail-deco n1"><use href="#nail"/></svg>
+  <svg class="nail-deco n2"><use href="#nail"/></svg>
+  <svg class="nail-deco n3"><use href="#nail"/></svg>
+
   <div class="hero-inner">
-    <span class="hero-tag">🏗️ 工務店・建設業向け</span>
-    <h1>現場の数字、<span class="accent">見える化</span>。<br>月¥1,500で出勤管理を一新。</h1>
-    <p class="lead">
-      Excelと紙、もう卒業しよう。<br>
-      Hitorinku（ヒトリンク）は工務店のための出勤・人工管理アプリ。<br>
-      集計・PDF・有給管理まで、月¥1,500ですべて完結します。
-    </p>
-    <div class="cta-row">
-      <a href="https://apps.apple.com/jp/app/hitorinku/id6765793130" class="btn btn-primary" id="cta-appstore">
-        📱 App Storeで入手
-      </a>
-      <a href="#features" class="btn btn-secondary">機能を見る</a>
+    <div>
+      <div class="hero-tag">FOR THE WORKSHOP</div>
+      <h1>現場の数字、<br><span class="accent">見える化</span>。</h1>
+      <p class="lead">
+        Hitorinku（ヒトリンク）は、工務店のための<br>
+        出勤・人工管理の手帳アプリ。<br>
+        マトリクス入力、PDF集計、有給管理まで、<br>
+        親方の手元で全部完結します。
+      </p>
+      <div class="cta-row">
+        <a href="https://apps.apple.com/jp/app/hitorinku/id6765793130" class="btn btn-primary" id="cta-appstore">
+          📱 App Storeで入手
+        </a>
+        <a href="#features" class="btn btn-secondary">機能を見る</a>
+      </div>
+      <p class="hero-meta"><strong>社員5名まで永久無料</strong> ・ iPhone/iPad対応 ・ クレカ登録不要</p>
     </div>
-    <p class="hero-meta"><strong>社員5名まで永久無料</strong> / iPhone・iPad対応 / クレカ登録不要</p>
+
+    <div class="hero-art">
+      <div class="blueprint-plate">
+        <div class="bp-body">
+          <header class="bp-top">
+            <p class="bp-plate-no">工務帳 — VOL. I</p>
+            <div class="bp-title-row">
+              <span class="vol">第一帖</span>
+              <span class="stamp">㊞</span>
+              <span class="vol">出勤録</span>
+            </div>
+          </header>
+
+          <div class="bp-slot">
+            <img class="bp-img" src="screenshots/hitorinku_01_matrix.jpg" alt="出勤マトリクス画面">
+          </div>
+
+          <footer class="bp-bottom">
+            <div class="bp-names">
+              <p class="bp-sci">Matrix · Daily Attendance</p>
+              <p class="bp-jp">マトリクス出勤記録 — 親方の目線で</p>
+            </div>
+            <p class="bp-foot">From the Hitorinku Field Notebook</p>
+          </footer>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<section style="background: var(--white);">
+<!-- 区切り -->
+<div class="divider">
+  <svg width="120" height="20" viewBox="0 0 120 20" style="color:var(--slate)"><use href="#divider-rivet"/></svg>
+</div>
+
+<!-- PAIN -->
+<section class="pain">
   <div class="container">
+    <div class="section-eyebrow">第二帖</div>
+    <div class="section-vol">現場のあるある</div>
     <h2>こんな悩み、ありませんか？</h2>
-    <p class="section-sub">中小工務店の8割が抱える、出勤管理の「あるある」</p>
+    <p class="section-sub">中小工務店の8割が抱える、出勤管理の「困った」</p>
     <div class="pain-grid">
       <div class="pain-card">
-        <div class="pain-emoji">📊</div>
+        <div class="pain-icon"><svg width="28" height="28"><use href="#document"/></svg></div>
         <h3>月末のExcel集計に1〜2日かかる</h3>
         <p>事務員が毎月残業。社員が増えるほど時間がかかる。</p>
       </div>
       <div class="pain-card">
-        <div class="pain-emoji">📅</div>
+        <div class="pain-icon"><svg width="28" height="28"><use href="#calendar"/></svg></div>
         <h3>有給日数の把握が曖昧</h3>
         <p>「何日残ってる？」社員からの問い合わせに毎回計算。</p>
       </div>
       <div class="pain-card">
-        <div class="pain-emoji">📝</div>
+        <div class="pain-icon"><svg width="28" height="28"><use href="#notebook"/></svg></div>
         <h3>賃金台帳PDFの作成が面倒</h3>
         <p>Excelで作って印刷して…毎月の手作業。</p>
       </div>
       <div class="pain-card">
-        <div class="pain-emoji">📱</div>
-        <h3>社員からのLINE連絡で混乱</h3>
+        <div class="pain-icon"><svg width="28" height="28"><use href="#phone"/></svg></div>
+        <h3>LINE連絡で情報がバラバラ</h3>
         <p>「今日休みます」「○日に有給」がバラバラに飛んでくる。</p>
       </div>
     </div>
   </div>
 </section>
 
+<div class="divider">
+  <svg width="120" height="20" viewBox="0 0 120 20" style="color:var(--slate)"><use href="#divider-rivet"/></svg>
+</div>
+
+<!-- FEATURES -->
 <section class="features" id="features">
   <div class="container">
-    <h2>Hitorinkuが解決します</h2>
-    <p class="section-sub">3つの主要機能で月末事務がラクになる</p>
+    <div class="section-eyebrow">第三帖</div>
+    <div class="section-vol">三つの道具立て</div>
+    <h2>Hitorinku が、解決します</h2>
+    <p class="section-sub">3つの主要機能で、月末事務が「ゼロ作業」になる</p>
 
     <div class="feature-row">
       <div class="feature-text">
-        <span class="feature-num">1</span>
+        <div class="feature-num">─ 壱 ─</div>
         <h3>マトリクス出勤管理</h3>
         <p>社員×日付のマトリクス画面で、誰が何日働いたかが一目でわかる。タップ1つで出勤入力、現場の割当もブラシで一括設定。</p>
         <ul>
@@ -481,13 +1188,18 @@
           <li>前日コピー・全員出勤など一括入力</li>
         </ul>
       </div>
-      <div class="feature-img"><img src="screenshots/hitorinku_01_matrix.jpg" alt="出勤マトリクス画面" loading="lazy"></div>
+      <div>
+        <div class="feature-img-wrap">
+          <img src="screenshots/hitorinku_01_matrix.jpg" alt="出勤マトリクス画面" loading="lazy">
+        </div>
+        <div class="feature-caption">— MATRIX —</div>
+      </div>
     </div>
 
     <div class="feature-row reverse">
       <div class="feature-text">
-        <span class="feature-num">2</span>
-        <h3>PDF・CSV出力で月末ゼロ作業</h3>
+        <div class="feature-num">─ 弐 ─</div>
+        <h3>PDF・CSV出力で<br>月末ゼロ作業</h3>
         <p>賃金台帳・出勤簿のPDFが1秒で完成。CSV出力で会計ソフトとも連携可能。</p>
         <ul>
           <li>社員別・現場別の人工集計PDF</li>
@@ -495,13 +1207,18 @@
           <li>会社名・ロゴ入りで体裁よく出力</li>
         </ul>
       </div>
-      <div class="feature-img"><img src="screenshots/hitorinku_02_summary.jpg" alt="集計・PDF出力画面" loading="lazy"></div>
+      <div>
+        <div class="feature-img-wrap">
+          <img src="screenshots/hitorinku_02_summary.jpg" alt="集計・PDF出力画面" loading="lazy">
+        </div>
+        <div class="feature-caption">— EXPORT —</div>
+      </div>
     </div>
 
     <div class="feature-row">
       <div class="feature-text">
-        <span class="feature-num">3</span>
-        <h3>労基法準拠の有給管理</h3>
+        <div class="feature-num">─ 参 ─</div>
+        <h3>労基法準拠の<br>有給管理</h3>
         <p>5日取得義務の進捗バー・自動付与・FIFO消費・時効処理。法対応もアプリにお任せ。</p>
         <ul>
           <li>勤続年数に応じた自動付与</li>
@@ -509,15 +1226,27 @@
           <li>社員アプリから有給申請 → 経営者が承認</li>
         </ul>
       </div>
-      <div class="feature-img"><img src="screenshots/hitorinku_04_invite.jpg" alt="有給申請画面" loading="lazy"></div>
+      <div>
+        <div class="feature-img-wrap">
+          <img src="screenshots/hitorinku_04_invite.jpg" alt="有給申請画面" loading="lazy">
+        </div>
+        <div class="feature-caption">— LEAVE —</div>
+      </div>
     </div>
   </div>
 </section>
 
+<div class="divider">
+  <svg width="120" height="20" viewBox="0 0 120 20" style="color:var(--slate)"><use href="#divider-rivet"/></svg>
+</div>
+
+<!-- PRICING -->
 <section class="pricing" id="pricing">
   <div class="container">
+    <div class="section-eyebrow">第四帖</div>
+    <div class="section-vol">三つのお値段</div>
     <h2>料金</h2>
-    <p class="section-sub">社員5名までずっと無料・有料化はいつでも</p>
+    <p class="section-sub">社員5名まで永久無料・有料化はいつでも</p>
     <div class="price-grid">
       <div class="price-card">
         <div class="price-name">無料プラン</div>
@@ -531,7 +1260,7 @@
         </ul>
       </div>
       <div class="price-card recommended">
-        <div class="price-badge">おすすめ・年額</div>
+        <div class="price-badge">推奨・年額</div>
         <div class="price-name">年額プラン</div>
         <div class="price-amount">¥15,000</div>
         <div class="price-period">/年（月換算 ¥1,250）</div>
@@ -557,35 +1286,35 @@
   </div>
 </section>
 
-<!-- BOOTH 商品（Excelテンプレ）誘導 -->
-<section style="background: linear-gradient(135deg, #FFF8EC 0%, #FFE9C8 100%); padding: 56px 24px;">
-  <div class="container" style="max-width: 880px;">
-    <div style="background: var(--white); border-radius: 18px; padding: 36px 32px; border: 2px solid var(--orange); box-shadow: 0 10px 40px rgba(245, 166, 35, 0.15); display: grid; grid-template-columns: 1fr; gap: 24px;">
-      <div>
-        <div style="display: inline-block; background: var(--orange); color: var(--white); padding: 4px 14px; border-radius: 100px; font-weight: 900; font-size: 11px; margin-bottom: 12px;">
-          BOOTH限定販売
-        </div>
-        <h3 style="font-size: clamp(20px, 3vw, 26px); color: var(--navy); margin-bottom: 12px; font-weight: 900;">
-          まずはExcelで試したい方へ
-        </h3>
-        <p style="color: var(--text-sub); margin-bottom: 14px; line-height: 1.8;">
-          Hitorinkuと同じ機能を <strong style="color: var(--navy);">Excelテンプレ6本</strong> で再現しました。<br>
-          出勤簿・賃金台帳・36協定届出書・有給管理台帳・現場別集計・給与明細書、<br>
-          <strong>全部入りで¥1,980</strong>。アプリ導入前のテストにもどうぞ。
-        </p>
-        <a href="https://upthemoon.booth.pm/items/8343451" target="_blank" rel="noopener" class="btn btn-primary" style="background: var(--orange); margin-right: 8px;">
-          BOOTHで購入する →
-        </a>
-        <span style="font-size: 13px; color: var(--text-sub);">¥1,980 / ダウンロード商品</span>
-      </div>
+<!-- BOOTH 商品 -->
+<section class="booth-section">
+  <div class="container">
+    <div class="booth-card">
+      <h3>まずはExcelで試したい方へ</h3>
+      <p>
+        Hitorinkuと同じ機能を <strong>Excelテンプレ6本</strong> で再現しました。<br>
+        出勤簿・賃金台帳・36協定届出書・有給管理台帳・現場別集計・給与明細書、<br>
+        <strong>全部入りで¥1,980</strong>。アプリ導入前のテストにもどうぞ。
+      </p>
+      <a href="https://upthemoon.booth.pm/items/8343451" target="_blank" rel="noopener" class="btn btn-primary" style="background: var(--alizarin); box-shadow: 0 6px 18px rgba(178, 63, 56, 0.3);">
+        BOOTHで購入する →
+      </a>
+      <span class="price-tag">¥1,980 / ダウンロード商品</span>
     </div>
   </div>
 </section>
 
-<section style="background: var(--white);" id="faq">
+<div class="divider">
+  <svg width="120" height="20" viewBox="0 0 120 20" style="color:var(--slate)"><use href="#divider-rivet"/></svg>
+</div>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
   <div class="container">
+    <div class="section-eyebrow">第五帖</div>
+    <div class="section-vol">よくある問い合わせ</div>
     <h2>よくある質問</h2>
-    <p class="section-sub">導入前に気になるポイント</p>
+    <p class="section-sub">導入前に、気になるポイント</p>
     <div class="faq">
       <details>
         <summary>パソコンでも使えますか？</summary>
@@ -655,15 +1384,18 @@
   </div>
 </section>
 
-<section style="background: var(--bg);" id="contact">
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
   <div class="container">
+    <div class="section-eyebrow">第六帖</div>
+    <div class="section-vol">取次帖</div>
     <h2>お問い合わせ・デモ依頼</h2>
     <p class="section-sub">導入前のご相談、ご質問など、お気軽にどうぞ</p>
     <form class="contact" action="https://formspree.io/f/xwvywkpw" method="POST">
-      <label for="name">お名前 / 会社名 <span style="color:#E54">*</span></label>
+      <label for="name">お名前 / 会社名 <span style="color:var(--alizarin)">*</span></label>
       <input type="text" name="name" id="name" required>
 
-      <label for="email">メールアドレス <span style="color:#E54">*</span></label>
+      <label for="email">メールアドレス <span style="color:var(--alizarin)">*</span></label>
       <input type="email" name="email" id="email" required>
 
       <label for="company-size">社員数（おおよそ）</label>
@@ -677,10 +1409,11 @@
   </div>
 </section>
 
+<!-- FINAL CTA -->
 <section class="cta-final" id="download">
   <div class="container">
-    <h2>まずは無料で始めませんか？</h2>
-    <p>クレカ登録不要・社員5名まで永久無料・3分で導入完了</p>
+    <h2>現場の数字を、<br>もっと身近に。</h2>
+    <p>クレカ登録不要・社員5名まで永久無料<br>3分で導入完了</p>
     <a href="https://apps.apple.com/jp/app/hitorinku/id6765793130" class="btn btn-primary" id="cta-appstore-bottom">
       📱 App Storeで入手する
     </a>
@@ -688,18 +1421,18 @@
 </section>
 
 <footer>
+  <div class="footer-mark">❋  Hitorinku  ❋</div>
   <div>
     <a href="https://upthemoon.github.io/hitorinku-privacy/">プライバシーポリシー</a>
     <a href="/support.html">サポート</a>
     <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">利用規約</a>
   </div>
-  <div style="margin-top: 14px;">
+  <div style="margin-top: 16px;">
     © 2026 Up the Moon LLC. Hitorinku is a product of Up the Moon LLC.
   </div>
 </footer>
 
 <script>
-  // CTA click tracking
   document.querySelectorAll('a[id^="cta-"]').forEach(el => {
     el.addEventListener('click', () => {
       if (typeof gtag === 'function') {
