@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://roygraphy-web.github.io/hitorinku-lp/sitemap.xml
+Sitemap: https://hitorinku.upthemoon.co.jp/sitemap.xml
